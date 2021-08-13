@@ -13,5 +13,13 @@ namespace Mass_Effect_Instalador
     /// </summary>
     public partial class App : Application
     {
+        public static string cmd = string.Empty;
+
+        private void Application_Startup(object sender, StartupEventArgs e)
+        {
+            MainWindow wnd = new MainWindow();
+            cmd = e.Args[0];
+            wnd.Show();
+        }
     }
 }
