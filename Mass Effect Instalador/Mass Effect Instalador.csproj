@@ -7,4 +7,12 @@
     <UseWPF>true</UseWPF>
   </PropertyGroup>
 
+  <ItemGroup>
+    <None Remove="gU3iRCur_400x400.jpg" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Resource Include="gU3iRCur_400x400.jpg" />
+  </ItemGroup>
+
 </Project>

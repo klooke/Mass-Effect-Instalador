@@ -8,7 +8,7 @@
         Title="Extração" Height="137" Width="350"
         ContentRendered="MainWindow_ContentRendered"
         Closing="MainWindow_Closing"
-        WindowStyle="None" WindowStartupLocation="Manual" ResizeMode="NoResize" TabIndex="2147483641" Icon="/gU3iRCur_400x400.jpg" Topmost="True" ShowInTaskbar="False">
+        WindowStyle="None" WindowStartupLocation="Manual" ResizeMode="NoResize" TabIndex="2147483641" Topmost="True" ShowInTaskbar="False" Icon="/gU3iRCur_400x400.jpg">
     <Grid>
         <ProgressBar x:Name="Dir" Height="29" Margin="10,96,10,0" VerticalAlignment="Top" Minimum="0" Maximum="406" Value="0"/>
         <TextBlock x:Name="textTitulo" Margin="10,10,10,0" Text="Extraindo.... " TextWrapping="Wrap" VerticalAlignment="Top" Height="21" FontWeight="Bold"/>
