@@ -6,8 +6,6 @@ namespace Mass_Effect_Instalador
 {
     public partial class MainWindow : Window
     {
-        private bool isBusy = false;
-
         public MainWindow()
         {
             InitializeComponent();
@@ -18,17 +16,32 @@ namespace Mass_Effect_Instalador
             Rect desktopWorkingArea = SystemParameters.WorkArea;
             Left = desktopWorkingArea.Right - Width;
             Top = desktopWorkingArea.Bottom - Height;
-        }
 
+            BackgroundWorker worker = new()
+            {
+                WorkerReportsProgress = true
+            };
+            worker.DoWork += Worker_DoWork;
+            worker.ProgressChanged += worker_ProgressChanged;
+            worker.RunWorkerCompleted += worker_RunWorkerCompleted;
+            worker.RunWorkerAsync(10000);
+        }
         private void MainWindow_Closing(object sender, CancelEventArgs e)
         {
-            if (isBusy)
-            {
-                if (MessageBox.Show(this, "A instalação ainda não está concluida, se fechar agora todos os arquivos podem ser corrompidos, tem certeza que deseja sair?", "Atenção", MessageBoxButton.YesNo, MessageBoxImage.Stop) == MessageBoxResult.No)
-                {
-                    e.Cancel = true;
-                }
-            }
+
+        }
+
+        private void Worker_DoWork(object sender, DoWorkEventArgs e)
+        { 
+
+        }
+        private void worker_ProgressChanged(object sender, ProgressChangedEventArgs e)
+        {
+
+        }
+        private void worker_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
+        {
+
         }
     }
 }
