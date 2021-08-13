@@ -5,6 +5,23 @@
     <TargetFramework>net5.0-windows</TargetFramework>
     <RootNamespace>Mass_Effect_Instalador</RootNamespace>
     <UseWPF>true</UseWPF>
+    <ApplicationIcon>c09f9caf5e08836d4673ccdd69bb041e.ico</ApplicationIcon>
+    <Platforms>AnyCPU;x64</Platforms>
+    <Authors>klooke</Authors>
+    <Company>Klooke Games</Company>
+    <Description>Utilizando a biblioteca do LegendaryExplorer, esse programa é utilizado para substituir e montar todos os arquivos TLKs, automatizando a instalação de traduções.</Description>
+    <Copyright></Copyright>
+    <StartupObject>Mass_Effect_Instalador.App</StartupObject>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <PlatformTarget>AnyCPU</PlatformTarget>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <DefineConstants>TRACE</DefineConstants>
+    <Optimize>true</Optimize>
+    <GenerateSerializationAssemblies>Off</GenerateSerializationAssemblies>
   </PropertyGroup>
 
   <ItemGroup>
@@ -13,6 +30,12 @@
 
   <ItemGroup>
     <Resource Include="gU3iRCur_400x400.jpg" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="List.txt">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
 
 </Project>

@@ -6,6 +6,7 @@
         xmlns:local="clr-namespace:Mass_Effect_Instalador"
         mc:Ignorable="d"
         Title="Extração" Height="137" Width="350"
+        Loaded="MainWindow_Loaded"
         ContentRendered="MainWindow_ContentRendered"
         Closing="MainWindow_Closing"
         WindowStyle="None" WindowStartupLocation="Manual" ResizeMode="NoResize" TabIndex="2147483641" Topmost="True" Icon="/gU3iRCur_400x400.jpg" ShowInTaskbar="False">
