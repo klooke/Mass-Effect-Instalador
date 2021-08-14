@@ -48,13 +48,32 @@ namespace Mass_Effect_Instalador
             //MessageBox.Show(directoryInstall);
             if (File.Exists(Directory.GetCurrentDirectory() + "\\list.txt"))
             {
-                checkFiles = true;
-                var filesList = File.ReadAllLines(Directory.GetCurrentDirectory() + "\\list.txt");
+                countFiles = 0;
+                string[] filesList = File.ReadAllLines(Directory.GetCurrentDirectory() + "\\list.txt");
+
+                // Verificar se todos os arquivos existem e fazer backup
+                for (int i = 0; i < filesList.Length; i++)
+                {
+                    if (!File.Exists(directoryInstall + filesList[i]))
+                    {
+                        checkFiles = false;
+                        break;
+                    }
+                    else
+                    {
+                        DirectoryInfo infoNewDir = Directory.CreateDirectory(directoryGame + "\\_Backup");
+                        File.Copy(directoryInstall + filesList[i], infoNewDir.FullName + "\\" + filesList[i], true);
+                    }
+                    checkFiles = true;
+                }
             }
         }
         private void worker_ProgressChanged(object sender, ProgressChangedEventArgs e)
         {
-
+            Dir.Value = e.ProgressPercentage;
+            string s = (int)(e.ProgressPercentage / Dir.Maximum * 100) + "%";
+            Title = "Extração: " + s;
+            textTitulo.Text = "Extraindo... " + s;
         }
         private void worker_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
         {
