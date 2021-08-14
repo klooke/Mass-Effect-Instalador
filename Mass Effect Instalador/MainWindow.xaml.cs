@@ -48,6 +48,7 @@ namespace Mass_Effect_Instalador
             //MessageBox.Show(directoryInstall);
             if (File.Exists(Directory.GetCurrentDirectory() + "\\list.txt"))
             {
+                checkFiles = true;
                 countFiles = 0;
                 string[] filesList = File.ReadAllLines(Directory.GetCurrentDirectory() + "\\list.txt");
 
@@ -64,7 +65,15 @@ namespace Mass_Effect_Instalador
                         DirectoryInfo infoNewDir = Directory.CreateDirectory(directoryGame + "\\_Backup");
                         File.Copy(directoryInstall + filesList[i], infoNewDir.FullName + "\\" + filesList[i], true);
                     }
-                    checkFiles = true;
+                }
+
+                // Verificar os arquivos da tradução
+                for (int i = 0; i < filesList.Length; i++)
+                {
+                    if (Directory.GetFiles(Directory.GetCurrentDirectory() + "\\Files\\").Length != 1006)
+                    {
+                        checkFiles = false;
+                    }
                 }
             }
         }
