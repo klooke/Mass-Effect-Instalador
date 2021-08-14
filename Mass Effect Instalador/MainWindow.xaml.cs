@@ -1,4 +1,6 @@
-﻿using System;
+﻿using LegendaryExplorerCore.Packages;
+using LegendaryExplorerCore.TLK.ME1;
+using System;
 using System.ComponentModel;
 using System.IO;
 using System.Windows;
@@ -16,6 +18,8 @@ namespace Mass_Effect_Instalador
         public MainWindow()
         {
             InitializeComponent();
+            MEPackageHandler.Initialize();
+            PackageSaver.Initialize();
         }
 
         private void MainWindow_Loaded(Object sender, EventArgs e)
@@ -37,7 +41,13 @@ namespace Mass_Effect_Instalador
         }
         private void MainWindow_Closing(object sender, CancelEventArgs e)
         {
-
+            if (isBusy)
+            {
+                if (MessageBox.Show(this, "A instalação ainda não está concluida, se fechar agora todos os arquivos podem ser corrompidos, tem certeza que deseja sair?", "Atenção", MessageBoxButton.YesNo, MessageBoxImage.Stop) == MessageBoxResult.No)
+                {
+                    e.Cancel = true;
+                }
+            }
         }
 
         private void Worker_DoWork(object sender, DoWorkEventArgs e)
@@ -63,17 +73,38 @@ namespace Mass_Effect_Instalador
                     else
                     {
                         DirectoryInfo infoNewDir = Directory.CreateDirectory(directoryGame + "\\_Backup");
-                        File.Copy(directoryInstall + filesList[i], infoNewDir.FullName + "\\" + filesList[i], true);
+                        if (!File.Exists(infoNewDir.FullName + "\\" + filesList[i])) File.Copy(directoryInstall + filesList[i], infoNewDir.FullName + "\\" + filesList[i]);
                     }
                 }
 
-                // Verificar os arquivos da tradução
                 for (int i = 0; i < filesList.Length; i++)
                 {
-                    if (Directory.GetFiles(Directory.GetCurrentDirectory() + "\\Files\\").Length != 1006)
+                    if (!checkFiles) break;
+
+                    isBusy = true;
+                    using IMEPackage pcc = MEPackageHandler.OpenLE1Package(directoryInstall + filesList[i]);
+
+                    for (int j = 0; j < pcc.LocalTalkFiles.Count; j++)
                     {
-                        checkFiles = false;
+                        var talkfile = pcc.LocalTalkFiles[j];
+                        if (talkfile.Name == "tlk_M" || talkfile.Name == "tlk" || talkfile.Name == "GlobalTlk_tlk" || talkfile.Name == "GlobalTlk_tlk_M")
+                        {
+                            var tlkPathName = Directory.GetCurrentDirectory() + "\\Files\\" + talkfile.BioTlkSetName + "." + talkfile.Name + ".xml";
+                            if (File.Exists(tlkPathName))
+                            {
+                                HuffmanCompression compressor = new();
+                                compressor.LoadInputData(tlkPathName);
+                                compressor.serializeTalkfileToExport(pcc.GetUExport(talkfile.UIndex), true);
+                                countFiles++;
+                            }
+                            else
+                            {
+                                checkFiles = false;
+                                break;
+                            }
+                        }
                     }
+                    (sender as BackgroundWorker).ReportProgress(i);
                 }
             }
         }

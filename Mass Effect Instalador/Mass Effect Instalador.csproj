@@ -11,16 +11,12 @@
     <Company>Klooke Games</Company>
     <Description>Utilizando a biblioteca do LegendaryExplorer, esse programa é utilizado para substituir e montar todos os arquivos TLKs, automatizando a instalação de traduções.</Description>
     <Copyright></Copyright>
-    <StartupObject>Mass_Effect_Instalador.App</StartupObject>
-  </PropertyGroup>
-
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
-    <PlatformTarget>AnyCPU</PlatformTarget>
+    <StartupObject></StartupObject>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <DefineConstants>TRACE</DefineConstants>
-    <Optimize>true</Optimize>
+    <Optimize>false</Optimize>
     <GenerateSerializationAssemblies>Off</GenerateSerializationAssemblies>
   </PropertyGroup>
 
@@ -29,11 +25,24 @@
   </ItemGroup>
 
   <ItemGroup>
+    <PackageReference Include="Microsoft.IO.RecyclableMemoryStream" Version="2.1.3" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Reference Include="LegendaryExplorerCore">
+      <HintPath>..\..\LegendaryExplorer\LegendaryExplorer\LegendaryExplorerCore\bin\x64\WinDebug\net5.0\LegendaryExplorerCore.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+
+  <ItemGroup>
     <Resource Include="gU3iRCur_400x400.jpg" />
   </ItemGroup>
 
   <ItemGroup>
     <None Update="List.txt">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="oo2core_8_win64.dll">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
   </ItemGroup>
