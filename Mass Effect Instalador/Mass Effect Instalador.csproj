@@ -3,7 +3,7 @@
   <PropertyGroup>
     <OutputType>WinExe</OutputType>
     <TargetFramework>net5.0-windows</TargetFramework>
-    <RootNamespace>Mass_Effect_Instalador</RootNamespace>
+    <RootNamespace>MassEffectInstalador</RootNamespace>
     <UseWPF>true</UseWPF>
     <ApplicationIcon>c09f9caf5e08836d4673ccdd69bb041e.ico</ApplicationIcon>
     <Platforms>AnyCPU;x64</Platforms>
@@ -11,13 +11,17 @@
     <Company>Klooke Games</Company>
     <Description>Utilizando a biblioteca do LegendaryExplorer, esse programa é utilizado para substituir e montar todos os arquivos TLKs, automatizando a instalação de traduções.</Description>
     <Copyright></Copyright>
-    <StartupObject></StartupObject>
+    <StartupObject>MassEffectInstalador.App</StartupObject>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <DefineConstants>TRACE</DefineConstants>
     <Optimize>false</Optimize>
     <GenerateSerializationAssemblies>Off</GenerateSerializationAssemblies>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <Optimize>false</Optimize>
   </PropertyGroup>
 
   <ItemGroup>
@@ -30,7 +34,7 @@
 
   <ItemGroup>
     <Reference Include="LegendaryExplorerCore">
-      <HintPath>..\..\LegendaryExplorer\LegendaryExplorer\LegendaryExplorerCore\bin\x64\WinDebug\net5.0\LegendaryExplorerCore.dll</HintPath>
+      <HintPath>..\..\LegendaryExplorer\LegendaryExplorer\LegendaryExplorerCore\bin\x64\WPFDebug\net5.0\LegendaryExplorerCore.dll</HintPath>
     </Reference>
   </ItemGroup>
 
@@ -39,9 +43,21 @@
   </ItemGroup>
 
   <ItemGroup>
-    <None Update="List.txt">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
+    <Compile Update="Properties\Resources.Designer.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Resources.resx</DependentUpon>
+    </Compile>
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Update="Properties\Resources.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+  </ItemGroup>
+
+  <ItemGroup>
     <None Update="oo2core_8_win64.dll">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
