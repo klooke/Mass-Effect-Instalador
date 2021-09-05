@@ -11,9 +11,12 @@ namespace MassEffectInstalador
     {
         private const int LE1_TLK_COUNT = 1678;
         private const int LE1_PCC_COUNT = 406;
+        private const int LE2_TLK_COUNT = 59;
 
         private bool isBusy;
-        private bool packagesExistLE1;
+        private readonly string tlkPathLE1 = Directory.GetCurrentDirectory() + "\\Files\\ME1\\";
+        private readonly string tlkPathLE2 = Directory.GetCurrentDirectory() + "\\Files\\ME2\\";
+        private bool isInstalled;
         private int countFiles;
 
         public MainWindow()
@@ -22,7 +25,6 @@ namespace MassEffectInstalador
             MEPackageHandler.Initialize();
             PackageSaver.Initialize();
         }
-
         private void MainWindow_Loaded(object sender, EventArgs e)
         {
             Rect desktopWorkingArea = SystemParameters.WorkArea;
@@ -51,11 +53,12 @@ namespace MassEffectInstalador
 
         private void Worker_DoWork(object sender, DoWorkEventArgs e)
         {
-            string tlkPathLE1 = Directory.GetCurrentDirectory() + "\\Files\\";
+            //Preparação
+            if(!CheckFilesToInstall()) return;
+
             string installPath = App.directoryGame + "\\Game\\ME1\\BioGame\\CookedPCConsole\\";
             string[] packagesPath = Properties.Resources.ListPackageLE1.Split("\r\n", StringSplitOptions.RemoveEmptyEntries);
 
-            if(NumberTlkToInstall(tlkPathLE1) != LE1_TLK_COUNT) return;
             if(!PackagesExist(installPath, packagesPath)) return;
             if(!MakeBackup(installPath, packagesPath)) return;
 
@@ -77,6 +80,7 @@ namespace MassEffectInstalador
                 }
                 (sender as BackgroundWorker).ReportProgress(i);
             }
+            isInstalled = true;
         }
         private void Worker_ProgressChanged(object sender, ProgressChangedEventArgs e)
         {
@@ -88,7 +92,7 @@ namespace MassEffectInstalador
         private void Worker_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
         {
             isBusy = false;
-            if(packagesExistLE1)
+            if(isInstalled)
             {
                 if(countFiles == LE1_TLK_COUNT)
                     MessageBox.Show(this, "Instalação foi concluida com êxito, aproveite!", "Atenção", MessageBoxButton.OK, MessageBoxImage.Information);
@@ -97,9 +101,16 @@ namespace MassEffectInstalador
                         "Por favor reinstale a tradução.", "Aviso", MessageBoxButton.OK, MessageBoxImage.Warning);
             }
             else
-                MessageBox.Show(this, "Não foi possivel concluir a instalação, arquivos não encontrados!", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                MessageBox.Show("Não foi possivel concluir a instalação, arquivos não encontrados!", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
 
             Application.Current.Shutdown();
+        }
+        private bool CheckFilesToInstall()
+        {
+            if(NumberTlkToInstall(tlkPathLE1) != LE1_TLK_COUNT || NumberTlkToInstall(tlkPathLE2) != LE2_TLK_COUNT)
+                return false;
+
+            return true;
         }
         private static int NumberTlkToInstall(string path)
         {
@@ -107,18 +118,16 @@ namespace MassEffectInstalador
         }
         private bool PackagesExist(string path, string[] files)
         {
-            packagesExistLE1 = true;
-
             if (!Directory.Exists(path) || files.Length != LE1_PCC_COUNT)
-                packagesExistLE1 = false;
+                return false;
 
             foreach(string file in files)
             {
                 if (!File.Exists(path + file))
-                    packagesExistLE1 = false;
+                    return false;
             }
 
-            return packagesExistLE1;
+            return true;
         }
         private static bool MakeBackup(string path, string[] files)
         {
