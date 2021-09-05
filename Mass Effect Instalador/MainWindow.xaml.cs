@@ -13,7 +13,7 @@ namespace MassEffectInstalador
         private const int LE1_PCC_COUNT = 406;
 
         private bool isBusy;
-        private bool packagesExists;
+        private bool packagesExistLE1;
         private int countFiles;
 
         public MainWindow()
@@ -51,27 +51,27 @@ namespace MassEffectInstalador
 
         private void Worker_DoWork(object sender, DoWorkEventArgs e)
         {
-            string path = App.directoryGame + "\\Game\\ME1\\BioGame\\CookedPCConsole\\";
-            string newTalkPath = Directory.GetCurrentDirectory() + "\\Files\\";
-            string[] packagesLE1 = Properties.Resources.ListPackageLE1.Split("\r\n", StringSplitOptions.RemoveEmptyEntries);
+            string tlkPathLE1 = Directory.GetCurrentDirectory() + "\\Files\\";
+            string installPath = App.directoryGame + "\\Game\\ME1\\BioGame\\CookedPCConsole\\";
+            string[] packagesPath = Properties.Resources.ListPackageLE1.Split("\r\n", StringSplitOptions.RemoveEmptyEntries);
 
-            if(!CheckTalkToInstall(newTalkPath)) return;
-            if(!(packagesExists = PackagesExists(path, packagesLE1))) return;
-            if(!MakeBackup(path, packagesLE1)) return;
+            if(NumberTlkToInstall(tlkPathLE1) != LE1_TLK_COUNT) return;
+            if(!PackagesExist(installPath, packagesPath)) return;
+            if(!MakeBackup(installPath, packagesPath)) return;
 
-            for(int i = 0; i < packagesLE1.Length; i++)
+            for(int i = 0; i < packagesPath.Length; i++)
             {
                 isBusy = true;
-                using IMEPackage pcc = MEPackageHandler.OpenLE1Package(path + packagesLE1[i]);
-                for(int j = 0; j < pcc.LocalTalkFiles.Count; j++)
+                using IMEPackage package = MEPackageHandler.OpenLE1Package(installPath + packagesPath[i]);
+                for(int j = 0; j < package.LocalTalkFiles.Count; j++)
                 {
-                    ME1TalkFile talkFile = pcc.LocalTalkFiles[j];
-                    if(talkFile.Name is "tlk_M" or "GlobalTlk_tlk_M" or "tlk" or "GlobalTlk_tlk")
+                    ME1TalkFile tlkFile = package.LocalTalkFiles[j];
+                    if(tlkFile.Name is "tlk_M" or "GlobalTlk_tlk_M" or "tlk" or "GlobalTlk_tlk")
                     {
-                        string talkPath = newTalkPath + talkFile.BioTlkSetName + "." + talkFile.Name + ".xml";
+                        string tlkPathFull = tlkPathLE1 + tlkFile.BioTlkSetName + "." + tlkFile.Name + ".xml";
                         HuffmanCompression compressor = new();
-                        compressor.LoadInputData(talkPath);
-                        compressor.serializeTalkfileToExport(pcc.GetUExport(talkFile.UIndex), true);
+                        compressor.LoadInputData(tlkPathFull);
+                        compressor.serializeTalkfileToExport(package.GetUExport(tlkFile.UIndex), true);
                         countFiles++;
                     }
                 }
@@ -88,7 +88,7 @@ namespace MassEffectInstalador
         private void Worker_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
         {
             isBusy = false;
-            if(packagesExists)
+            if(packagesExistLE1)
             {
                 if(countFiles == LE1_TLK_COUNT)
                     MessageBox.Show(this, "Instalação foi concluida com êxito, aproveite!", "Atenção", MessageBoxButton.OK, MessageBoxImage.Information);
@@ -101,26 +101,24 @@ namespace MassEffectInstalador
 
             Application.Current.Shutdown();
         }
-        private static bool CheckTalkToInstall(string path)
+        private static int NumberTlkToInstall(string path)
         {
-            if (!Directory.Exists(path))
-                return false;
-            else if (Directory.GetFiles(path, "*.xml").Length != LE1_PCC_COUNT)
-                return false;
-
-            return true;
+            return Directory.Exists(path) ? Directory.GetFiles(path, "*.xml").Length : 0;
         }
-        private static bool PackagesExists(string path, string[] files)
+        private bool PackagesExist(string path, string[] files)
         {
-            if(!Directory.Exists(path) || files.Length != LE1_PCC_COUNT)
-                return false;
-            
+            packagesExistLE1 = true;
+
+            if (!Directory.Exists(path) || files.Length != LE1_PCC_COUNT)
+                packagesExistLE1 = false;
+
             foreach(string file in files)
             {
-                if(!File.Exists(path + file))
-                    return false;
+                if (!File.Exists(path + file))
+                    packagesExistLE1 = false;
             }
-            return true;
+
+            return packagesExistLE1;
         }
         private static bool MakeBackup(string path, string[] files)
         {
