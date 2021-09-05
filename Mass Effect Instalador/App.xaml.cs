@@ -11,8 +11,8 @@ namespace MassEffectInstalador
 
         private void Application_Startup(object sender, StartupEventArgs e)
         {
-            MainWindow wnd = new();
             directoryGame = e.Args[0];
+            MainWindow wnd = new();
             wnd.Show();
         }
     }

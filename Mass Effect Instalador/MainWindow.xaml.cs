@@ -9,13 +9,16 @@ namespace MassEffectInstalador
 {
     public partial class MainWindow : Window
     {
-        private const int LE1_TLK_COUNT = 1678;
-        private const int LE1_PCC_COUNT = 406;
-        private const int LE2_TLK_COUNT = 59;
+        private const int LE1_TLK_COUNT = 1006;
+        private const int LE2_TLK_COUNT = 60;
 
         private bool isBusy;
-        private readonly string tlkPathLE1 = Directory.GetCurrentDirectory() + "\\Files\\ME1\\";
-        private readonly string tlkPathLE2 = Directory.GetCurrentDirectory() + "\\Files\\ME2\\";
+        private readonly string tlkPathLE1 = Directory.GetCurrentDirectory() + @"\Files\ME1\";
+        private readonly string tlkPathLE2 = Directory.GetCurrentDirectory() + @"\Files\ME2\";
+        private readonly string installPathLE1 = App.directoryGame + @"\Game\ME1\BioGame\CookedPCConsole\";
+        private readonly string installPathLE2 = App.directoryGame + @"\Game\ME2\BioGame\";
+        private readonly string[] packagesPathLE1 = Properties.Resources.ListPackageLE1.Split("\r\n", StringSplitOptions.RemoveEmptyEntries);
+        private readonly string[] talksPathLE2 = Properties.Resources.ListTalkLE2.Split("\r\n", StringSplitOptions.RemoveEmptyEntries);
         private bool isInstalled;
         private int countFiles;
 
@@ -55,17 +58,14 @@ namespace MassEffectInstalador
         {
             //Preparação
             if(!CheckFilesToInstall()) return;
+            if(!CheckFilesToReplace()) return;
+            if(!MakeBackup()) return;
 
-            string installPath = App.directoryGame + "\\Game\\ME1\\BioGame\\CookedPCConsole\\";
-            string[] packagesPath = Properties.Resources.ListPackageLE1.Split("\r\n", StringSplitOptions.RemoveEmptyEntries);
-
-            if(!PackagesExist(installPath, packagesPath)) return;
-            if(!MakeBackup(installPath, packagesPath)) return;
-
-            for(int i = 0; i < packagesPath.Length; i++)
+            //Instalação da tradução do Mass Effect 1
+            for(int i = 0; i < packagesPathLE1.Length; i++)
             {
                 isBusy = true;
-                using IMEPackage package = MEPackageHandler.OpenLE1Package(installPath + packagesPath[i]);
+                using IMEPackage package = MEPackageHandler.OpenLE1Package(installPathLE1 + packagesPathLE1[i]);
                 for(int j = 0; j < package.LocalTalkFiles.Count; j++)
                 {
                     ME1TalkFile tlkFile = package.LocalTalkFiles[j];
@@ -116,34 +116,62 @@ namespace MassEffectInstalador
         {
             return Directory.Exists(path) ? Directory.GetFiles(path, "*.xml").Length : 0;
         }
-        private bool PackagesExist(string path, string[] files)
+        private bool CheckFilesToReplace()
         {
-            if (!Directory.Exists(path) || files.Length != LE1_PCC_COUNT)
+            if(!PackagesExist() || !TalksExist())
                 return false;
 
-            foreach(string file in files)
+            return true;
+        }
+        private bool PackagesExist()
+        {
+            if(!Directory.Exists(installPathLE1))
+                return false;
+
+            foreach(string pccLE1 in packagesPathLE1)
             {
-                if (!File.Exists(path + file))
+                if (!File.Exists(installPathLE1 + pccLE1))
                     return false;
             }
 
             return true;
         }
-        private static bool MakeBackup(string path, string[] files)
+        private bool TalksExist()
+        {
+            if(!Directory.Exists(installPathLE2))
+                return false;
+
+            foreach(string tlkLE2 in talksPathLE2)
+            {
+                if(Directory.GetFiles(installPathLE2, tlkLE2, SearchOption.AllDirectories).Length == 0)
+                    return false;
+            }
+
+            return true;
+        }
+        private bool MakeBackup()
         {
             try
             {
-                DirectoryInfo backupDirectory = Directory.CreateDirectory(App.directoryGame + "\\_Backup");
-                foreach(string file in files)
+                DirectoryInfo backupDirLE1 = Directory.CreateDirectory(App.directoryGame + @"\_Backup\ME1\");
+                foreach(string pccLE1 in packagesPathLE1)
                 {
-                    if(!File.Exists(backupDirectory.FullName + "\\" + file))
-                        File.Copy(path + file, backupDirectory.FullName + "\\" + file);
+                    if(!File.Exists(backupDirLE1.FullName + pccLE1))
+                        File.Copy(installPathLE1 + pccLE1, backupDirLE1.FullName + pccLE1);
+                }
+
+                DirectoryInfo backupDirLE2 = Directory.CreateDirectory(App.directoryGame + @"\_Backup\ME2\");
+                foreach (string tlkLE2 in talksPathLE2)
+                {
+                    string[] tlkFind = Directory.GetFiles(installPathLE2, tlkLE2, SearchOption.AllDirectories);
+                    if (!File.Exists(backupDirLE2.FullName + tlkLE2))
+                        File.Copy(tlkFind[0], backupDirLE2.FullName + tlkLE2);
                 }
                 return true;
             }
-            catch(IOException e)
+            catch
             {
-                MessageBox.Show("Não foi possivel fazer o backup, a instalação não pode ser concluida!\n\n" + e.Message, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                MessageBox.Show("Não foi possivel fazer o backup, a instalação não pode ser concluida!", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
                 return false;
             }
         }

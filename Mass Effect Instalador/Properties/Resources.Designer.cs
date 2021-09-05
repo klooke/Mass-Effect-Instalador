@@ -85,5 +85,41 @@ namespace MassEffectInstalador.Properties {
                 return ResourceManager.GetString("ListPackageLE1", resourceCulture);
             }
         }
+        
+        /// <summary>
+        ///   Consulta uma cadeia de caracteres localizada semelhante a BIOGame_INT.tlk
+        ///BioGame_Update_INT.tlk
+        ///DLC_33_INT.tlk
+        ///DLC_33_Test_INT.tlk
+        ///DLC_10_INT.tlk
+        ///DLC_10_Test_INT.tlk
+        ///DLC_11_INT.tlk
+        ///DLC_11_Test_INT.tlk
+        ///DLC_34_INT.tlk
+        ///DLC_34_Test_INT.tlk
+        ///DLC_15_INT.tlk
+        ///DLC_15_Test_INT.tlk
+        ///DLC_21_INT.tlk
+        ///DLC_21_Test_INT.tlk
+        ///DLC_40_INT.tlk
+        ///DLC_40_Test_INT.tlk
+        ///DLC_24_INT.tlk
+        ///DLC_24_Test_INT.tlk
+        ///DLC_25_INT.tlk
+        ///DLC_25_Test_INT.tlk
+        ///DLC_3_INT.tlk
+        ///DLC_3_Test_INT.tlk
+        ///DLC_2_INT.tlk
+        ///DLC_2_Test_INT.tlk
+        ///DLC_12_INT.tlk
+        ///DLC_12_Test_INT.tlk
+        ///DLC_19_INT.tlk
+        ///DLC_19_Test_INT [o restante da cadeia de caracteres foi truncado]&quot;;.
+        /// </summary>
+        internal static string ListTalkLE2 {
+            get {
+                return ResourceManager.GetString("ListTalkLE2", resourceCulture);
+            }
+        }
     }
 }

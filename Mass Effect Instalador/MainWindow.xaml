@@ -4,14 +4,14 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         mc:Ignorable="d"
-        Title="Extração" Height="137" Width="350"
+        Title="Instalação" Height="137" Width="350"
         Loaded="MainWindow_Loaded"
         ContentRendered="MainWindow_ContentRendered"
         Closing="MainWindow_Closing"
         WindowStyle="None" WindowStartupLocation="Manual" ResizeMode="NoResize" TabIndex="2147483641" Topmost="True" Icon="/gU3iRCur_400x400.jpg" ShowInTaskbar="False">
     <Grid>
         <ProgressBar x:Name="Dir" Height="29" Margin="10,96,10,0" VerticalAlignment="Top" Minimum="0" Maximum="406" Value="0"/>
-        <TextBlock x:Name="textTitulo" Margin="10,10,10,0" Text="Extraindo.... " TextWrapping="Wrap" VerticalAlignment="Top" Height="21" FontWeight="Bold"/>
-        <TextBlock x:Name="textTitulo_Copy" Margin="10,31,10,0" Text="Não desligue ou feche a janela durante a instalação, esse processo demora um pouco. (se ocorrer algum problema, desinstale a tradução para restaurar o backup!)" TextWrapping="Wrap" VerticalAlignment="Top" Height="45" FontSize="11"/>
+        <TextBlock x:Name="textTitulo" Margin="10,10,10,0" Text="Preparando instalação e backup..." TextWrapping="Wrap" VerticalAlignment="Top" Height="21" FontWeight="Bold"/>
+        <TextBlock x:Name="textMessage" Margin="10,31,10,0" Text="Não desligue ou feche a janela durante a instalação, esse processo demora um pouco. (se ocorrer algum problema, desinstale a tradução para restaurar o backup!)" TextWrapping="Wrap" VerticalAlignment="Top" Height="45" FontSize="11"/>
     </Grid>
 </Window>
