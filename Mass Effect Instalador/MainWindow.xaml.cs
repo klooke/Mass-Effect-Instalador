@@ -9,6 +9,7 @@ namespace MassEffectInstalador
 {
     public partial class MainWindow : Window
     {
+        private const int LE1_TLK_COUNT_INSTALLER = 1678;
         private const int LE1_TLK_COUNT = 1006;
         private const int LE2_TLK_COUNT = 60;
 
@@ -94,7 +95,7 @@ namespace MassEffectInstalador
             isBusy = false;
             if(isInstalled)
             {
-                if(countFiles == LE1_TLK_COUNT)
+                if(countFiles == LE1_TLK_COUNT_INSTALLER)
                     MessageBox.Show(this, "Instalação foi concluida com êxito, aproveite!", "Atenção", MessageBoxButton.OK, MessageBoxImage.Information);
                 else
                     MessageBox.Show(this, "Alguns arquivos não foram encontrados, por isso a tradução pode está incompleta.\n" +
@@ -158,6 +159,7 @@ namespace MassEffectInstalador
                 {
                     if(!File.Exists(backupDirLE1.FullName + pccLE1))
                         File.Copy(installPathLE1 + pccLE1, backupDirLE1.FullName + pccLE1);
+                    foreach (ME1TalkFile tlkFile in package.LocalTalkFiles)
                 }
 
                 DirectoryInfo backupDirLE2 = Directory.CreateDirectory(App.directoryGame + @"\_Backup\ME2\");
