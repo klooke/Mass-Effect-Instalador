@@ -119,6 +119,8 @@ namespace MassEffectInstalador
             }
             catch
             {
+                throw new InvalidOperationException("Não foi possivel fazer o backup dos arquivos!\n" +
+                    "Por favor, execute a tradução como administrador e tente novamente, caso o erro persista repare o game.");
             }
         }
         private void InstallTranslationLE1()
@@ -143,6 +145,8 @@ namespace MassEffectInstalador
             }
             catch
             {
+                throw new InvalidOperationException("Um erro ocorreu ao instalar a tradução do Mass effect 1!\n" +
+                    "Por favor, restaure o backup e tente novamente, caso o erro persista entre em contato klooke2018@gmail.com.");
             }
         }
         private void InstallTranslationLE2()
@@ -161,6 +165,8 @@ namespace MassEffectInstalador
             }
             catch
             {
+                throw new InvalidOperationException("Um erro ocorreu ao instalar a tradução do Mass effect 2!\n" +
+                    "Por favor, restaure o backup e tente novamente, caso o erro persista entre em contato klooke2018@gmail.com.");
             }
         }
     }
