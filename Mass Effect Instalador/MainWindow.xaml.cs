@@ -4,6 +4,7 @@ using System;
 using System.ComponentModel;
 using System.IO;
 using System.Windows;
+using ME2HuffmanCompression = LegendaryExplorerCore.TLK.ME2ME3.HuffmanCompression;
 
 namespace MassEffectInstalador
 {
@@ -14,6 +15,8 @@ namespace MassEffectInstalador
         private const int LE2_TLK_COUNT = 60;
 
         private bool isBusy;
+        private BackgroundWorker worker;
+
         private readonly string tlkPathLE1 = Directory.GetCurrentDirectory() + @"\Files\ME1\";
         private readonly string tlkPathLE2 = Directory.GetCurrentDirectory() + @"\Files\ME2\";
         private readonly string installPathLE1 = App.directoryGame + @"\Game\ME1\BioGame\CookedPCConsole\";
@@ -37,14 +40,12 @@ namespace MassEffectInstalador
         }
         private void MainWindow_ContentRendered(object sender, EventArgs e)
         {
-            BackgroundWorker worker = new()
+            worker = new()
             {
-                WorkerReportsProgress = true
             };
-            worker.DoWork += Worker_DoWork;
-            worker.ProgressChanged += Worker_ProgressChanged;
             worker.RunWorkerCompleted += Worker_RunWorkerCompleted;
-            worker.RunWorkerAsync(10000);
+            worker.DoWork += Translation;
+            worker.RunWorkerAsync();
         }
         private void MainWindow_Closing(object sender, CancelEventArgs e)
         {
@@ -55,40 +56,15 @@ namespace MassEffectInstalador
             }
         }
 
-        private void Worker_DoWork(object sender, DoWorkEventArgs e)
+        private void Translation(object sender, DoWorkEventArgs e)
         {
             //Preparação
             if(!CheckFilesToInstall()) return;
             if(!CheckFilesToReplace()) return;
-            if(!MakeBackup()) return;
 
-            //Instalação da tradução do Mass Effect 1
-            for(int i = 0; i < packagesPathLE1.Length; i++)
-            {
-                isBusy = true;
-                using IMEPackage package = MEPackageHandler.OpenLE1Package(installPathLE1 + packagesPathLE1[i]);
-                for(int j = 0; j < package.LocalTalkFiles.Count; j++)
-                {
-                    ME1TalkFile tlkFile = package.LocalTalkFiles[j];
-                    if(tlkFile.Name is "tlk_M" or "GlobalTlk_tlk_M" or "tlk" or "GlobalTlk_tlk")
-                    {
-                        string tlkPathFull = tlkPathLE1 + tlkFile.BioTlkSetName + "." + tlkFile.Name + ".xml";
-                        HuffmanCompression compressor = new();
-                        compressor.LoadInputData(tlkPathFull);
-                        compressor.serializeTalkfileToExport(package.GetUExport(tlkFile.UIndex), true);
-                        countFiles++;
-                    }
-                }
-                (sender as BackgroundWorker).ReportProgress(i);
-            }
             isInstalled = true;
-        }
-        private void Worker_ProgressChanged(object sender, ProgressChangedEventArgs e)
-        {
-            Dir.Value = e.ProgressPercentage;
-            string s = (int)(e.ProgressPercentage / Dir.Maximum * 100) + "%";
-            Title = "Extração: " + s;
-            textTitulo.Text = "Extraindo... " + s;
+            InstallTranslationLE1();
+            InstallTranslationLE2();
         }
         private void Worker_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
         {
@@ -150,31 +126,46 @@ namespace MassEffectInstalador
 
             return true;
         }
-        private bool MakeBackup()
+        private void InstallTranslationLE1()
         {
             try
             {
-                DirectoryInfo backupDirLE1 = Directory.CreateDirectory(App.directoryGame + @"\_Backup\ME1\");
-                foreach(string pccLE1 in packagesPathLE1)
+                foreach (string pccPathLE1 in packagesPathLE1)
                 {
-                    if(!File.Exists(backupDirLE1.FullName + pccLE1))
-                        File.Copy(installPathLE1 + pccLE1, backupDirLE1.FullName + pccLE1);
+                    using IMEPackage package = MEPackageHandler.OpenLE1Package(installPathLE1 + pccPathLE1);
                     foreach (ME1TalkFile tlkFile in package.LocalTalkFiles)
+                    {
+                        if (tlkFile.Name is "tlk_M" or "GlobalTlk_tlk_M" or "tlk" or "GlobalTlk_tlk")
+                        {
+                            string tlkPathFull = tlkPathLE1 + tlkFile.BioTlkSetName + "." + tlkFile.Name + ".xml";
+                            HuffmanCompression compressor = new();
+                            compressor.LoadInputData(tlkPathFull);
+                            compressor.serializeTalkfileToExport(package.GetUExport(tlkFile.UIndex), true);
+                            countFiles++;
+                        }
+                    }
                 }
-
-                DirectoryInfo backupDirLE2 = Directory.CreateDirectory(App.directoryGame + @"\_Backup\ME2\");
-                foreach (string tlkLE2 in talksPathLE2)
-                {
-                    string[] tlkFind = Directory.GetFiles(installPathLE2, tlkLE2, SearchOption.AllDirectories);
-                    if (!File.Exists(backupDirLE2.FullName + tlkLE2))
-                        File.Copy(tlkFind[0], backupDirLE2.FullName + tlkLE2);
-                }
-                return true;
             }
             catch
             {
-                MessageBox.Show("Não foi possivel fazer o backup, a instalação não pode ser concluida!", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
-                return false;
+            }
+        }
+        private void InstallTranslationLE2()
+        {
+            try
+            {
+                foreach (string talkPathLE2 in talksPathLE2)
+                {
+                    string tlkFind = Directory.GetFiles(installPathLE2, talkPathLE2, SearchOption.AllDirectories)[0];
+                    string tlkPathFull = tlkPathLE2 + talkPathLE2.Replace(".tlk", ".xml");
+                    ME2HuffmanCompression compressor = new();
+                    compressor.LoadInputData(tlkPathFull);
+                    compressor.SaveToFile(tlkFind);
+                    countFiles++;
+                }
+            }
+            catch
+            {
             }
         }
     }
