@@ -14,9 +14,10 @@ namespace MassEffectInstalador
         private const int LE1_TLK_COUNT = 1006;
         private const int LE2_TLK_COUNT = 60;
 
-        private bool isBusy;
         private BackgroundWorker worker;
 
+        private int indexPercentage;
+        private string subTitleUpdate;
         private readonly string tlkPathLE1 = Directory.GetCurrentDirectory() + @"\Files\ME1\";
         private readonly string tlkPathLE2 = Directory.GetCurrentDirectory() + @"\Files\ME2\";
         private readonly string installPathLE1 = App.directoryGame + @"\Game\ME1\BioGame\CookedPCConsole\";
@@ -31,6 +32,7 @@ namespace MassEffectInstalador
             InitializeComponent();
             MEPackageHandler.Initialize();
             PackageSaver.Initialize();
+            Dir.Maximum = (packagesPathLE1.Length * 2) + (talksPathLE2.Length * 2);
         }
         private void MainWindow_Loaded(object sender, EventArgs e)
         {
@@ -42,14 +44,17 @@ namespace MassEffectInstalador
         {
             worker = new()
             {
+                WorkerReportsProgress = true,
+                WorkerSupportsCancellation = true
             };
             worker.RunWorkerCompleted += Worker_RunWorkerCompleted;
             worker.DoWork += Translation;
+            worker.ProgressChanged += ProgressChanged;
             worker.RunWorkerAsync();
         }
         private void MainWindow_Closing(object sender, CancelEventArgs e)
         {
-            if(isBusy)
+            if (worker.IsBusy)
             {
                 if(MessageBox.Show(this, "A instalação ainda não está concluida, se fechar agora alguns arquivos podem ser corrompidos, tem certeza que deseja sair?", "Atenção", MessageBoxButton.YesNo, MessageBoxImage.Stop) == MessageBoxResult.No)
                     e.Cancel = true;
@@ -68,7 +73,6 @@ namespace MassEffectInstalador
         }
         private void Worker_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
         {
-            isBusy = false;
             if(isInstalled)
             {
                 if(countFiles == LE1_TLK_COUNT_INSTALLER)
@@ -103,6 +107,7 @@ namespace MassEffectInstalador
                     if (!File.Exists(installPathLE1 + pccLE1))
                         return;
 
+                    UpdateProgess("Fazendo backup do Mass Effect 1: ", indexPercentage++);
 
                     if (!File.Exists(backupDirLE1.FullName + pccLE1))
                         File.Copy(installPathLE1 + pccLE1, backupDirLE1.FullName + pccLE1);
@@ -112,6 +117,7 @@ namespace MassEffectInstalador
                 {
                     string tlkFind = Directory.GetFiles(installPathLE2, tlkLE2, SearchOption.AllDirectories)[0];
 
+                    UpdateProgess("Fazendo backup do Mass Effect 2: ", indexPercentage++);
 
                     if (!File.Exists(backupDirLE2.FullName + tlkLE2))
                         File.Copy(tlkFind, backupDirLE2.FullName + tlkLE2);
@@ -129,6 +135,7 @@ namespace MassEffectInstalador
             {
                 foreach (string pccPathLE1 in packagesPathLE1)
                 {
+                    UpdateProgess("Instalando tradução do Mass Effect 1: ", indexPercentage++);
                     using IMEPackage package = MEPackageHandler.OpenLE1Package(installPathLE1 + pccPathLE1);
                     foreach (ME1TalkFile tlkFile in package.LocalTalkFiles)
                     {
@@ -155,6 +162,7 @@ namespace MassEffectInstalador
             {
                 foreach (string talkPathLE2 in talksPathLE2)
                 {
+                    UpdateProgess("Instalando tradução do Mass Effect 2: ", indexPercentage++);
                     string tlkFind = Directory.GetFiles(installPathLE2, talkPathLE2, SearchOption.AllDirectories)[0];
                     string tlkPathFull = tlkPathLE2 + talkPathLE2.Replace(".tlk", ".xml");
                     ME2HuffmanCompression compressor = new();
@@ -168,6 +176,17 @@ namespace MassEffectInstalador
                 throw new InvalidOperationException("Um erro ocorreu ao instalar a tradução do Mass effect 2!\n" +
                     "Por favor, restaure o backup e tente novamente, caso o erro persista entre em contato klooke2018@gmail.com.");
             }
+        }
+        private void UpdateProgess(string message, int value)
+        {
+            subTitleUpdate = message;
+            worker.ReportProgress(value);
+        }
+        private void ProgressChanged(object sender, ProgressChangedEventArgs e)
+        {
+            Dir.Value = e.ProgressPercentage;
+            string percentage = (int)(e.ProgressPercentage / Dir.Maximum * 100) + "%";
+            textTitulo.Text = subTitleUpdate + percentage;
         }
     }
 }
