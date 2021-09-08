@@ -60,7 +60,7 @@ namespace MassEffectInstalador
         {
             //Preparação
             if(!CheckFilesToInstall()) return;
-            if(!CheckFilesToReplace()) return;
+            MakeBackup();
 
             isInstalled = true;
             InstallTranslationLE1();
@@ -93,38 +93,33 @@ namespace MassEffectInstalador
         {
             return Directory.Exists(path) ? Directory.GetFiles(path, "*.xml").Length : 0;
         }
-        private bool CheckFilesToReplace()
+        private void MakeBackup()
         {
-            if(!PackagesExist() || !TalksExist())
-                return false;
-
-            return true;
-        }
-        private bool PackagesExist()
-        {
-            if(!Directory.Exists(installPathLE1))
-                return false;
-
-            foreach(string pccLE1 in packagesPathLE1)
+            try
             {
-                if (!File.Exists(installPathLE1 + pccLE1))
-                    return false;
+                DirectoryInfo backupDirLE1 = Directory.CreateDirectory(App.directoryGame + @"\_Backup\ME1\");
+                foreach (string pccLE1 in packagesPathLE1)
+                {
+                    if (!File.Exists(installPathLE1 + pccLE1))
+                        return;
+
+
+                    if (!File.Exists(backupDirLE1.FullName + pccLE1))
+                        File.Copy(installPathLE1 + pccLE1, backupDirLE1.FullName + pccLE1);
+                }
+                DirectoryInfo backupDirLE2 = Directory.CreateDirectory(App.directoryGame + @"\_Backup\ME2\");
+                foreach (string tlkLE2 in talksPathLE2)
+                {
+                    string tlkFind = Directory.GetFiles(installPathLE2, tlkLE2, SearchOption.AllDirectories)[0];
+
+
+                    if (!File.Exists(backupDirLE2.FullName + tlkLE2))
+                        File.Copy(tlkFind, backupDirLE2.FullName + tlkLE2);
+                }
             }
-
-            return true;
-        }
-        private bool TalksExist()
-        {
-            if(!Directory.Exists(installPathLE2))
-                return false;
-
-            foreach(string tlkLE2 in talksPathLE2)
+            catch
             {
-                if(Directory.GetFiles(installPathLE2, tlkLE2, SearchOption.AllDirectories).Length == 0)
-                    return false;
             }
-
-            return true;
         }
         private void InstallTranslationLE1()
         {
