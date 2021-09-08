@@ -24,7 +24,6 @@ namespace MassEffectInstalador
         private readonly string installPathLE2 = App.directoryGame + @"\Game\ME2\BioGame\";
         private readonly string[] packagesPathLE1 = Properties.Resources.ListPackageLE1.Split("\r\n", StringSplitOptions.RemoveEmptyEntries);
         private readonly string[] talksPathLE2 = Properties.Resources.ListTalkLE2.Split("\r\n", StringSplitOptions.RemoveEmptyEntries);
-        private bool isInstalled;
         private int countFiles;
 
         public MainWindow()
@@ -47,51 +46,33 @@ namespace MassEffectInstalador
                 WorkerReportsProgress = true,
                 WorkerSupportsCancellation = true
             };
-            worker.RunWorkerCompleted += Worker_RunWorkerCompleted;
             worker.DoWork += Translation;
             worker.ProgressChanged += ProgressChanged;
+            worker.RunWorkerCompleted += Finished;
             worker.RunWorkerAsync();
         }
         private void MainWindow_Closing(object sender, CancelEventArgs e)
         {
             if (worker.IsBusy)
             {
-                if(MessageBox.Show(this, "A instalação ainda não está concluida, se fechar agora alguns arquivos podem ser corrompidos, tem certeza que deseja sair?", "Atenção", MessageBoxButton.YesNo, MessageBoxImage.Stop) == MessageBoxResult.No)
+                if (MessageBox.Show(this, "A instalação ainda não está concluida, se fechar agora alguns arquivos podem ser corrompidos, tem certeza que deseja sair?", "Atenção", MessageBoxButton.YesNo, MessageBoxImage.Stop) == MessageBoxResult.No)
                     e.Cancel = true;
             }
         }
 
         private void Translation(object sender, DoWorkEventArgs e)
         {
-            //Preparação
-            if(!CheckFilesToInstall()) return;
+            CheckFilesToInstall();
             MakeBackup();
 
-            isInstalled = true;
             InstallTranslationLE1();
             InstallTranslationLE2();
         }
-        private void Worker_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
+        private void CheckFilesToInstall()
         {
-            if(isInstalled)
-            {
-                if(countFiles == LE1_TLK_COUNT_INSTALLER)
-                    MessageBox.Show(this, "Instalação foi concluida com êxito, aproveite!", "Atenção", MessageBoxButton.OK, MessageBoxImage.Information);
-                else
-                    MessageBox.Show(this, "Alguns arquivos não foram encontrados, por isso a tradução pode está incompleta.\n" +
-                        "Por favor reinstale a tradução.", "Aviso", MessageBoxButton.OK, MessageBoxImage.Warning);
-            }
-            else
-                MessageBox.Show("Não foi possivel concluir a instalação, arquivos não encontrados!", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
-
-            Application.Current.Shutdown();
-        }
-        private bool CheckFilesToInstall()
-        {
-            if(NumberTlkToInstall(tlkPathLE1) != LE1_TLK_COUNT || NumberTlkToInstall(tlkPathLE2) != LE2_TLK_COUNT)
-                return false;
-
-            return true;
+            if (NumberTlkToInstall(tlkPathLE1) != LE1_TLK_COUNT || NumberTlkToInstall(tlkPathLE2) != LE2_TLK_COUNT)
+                throw new InvalidOperationException("Arquivos da tradução não foram encontrados!\n" +
+                    "Por favor, baixe a tradução novamente, caso o erro persista desative o ant-virus e tente novamente.");
         }
         private static int NumberTlkToInstall(string path)
         {
@@ -187,6 +168,23 @@ namespace MassEffectInstalador
             Dir.Value = e.ProgressPercentage;
             string percentage = (int)(e.ProgressPercentage / Dir.Maximum * 100) + "%";
             textTitulo.Text = subTitleUpdate + percentage;
+        }
+        private void Finished(object sender, RunWorkerCompletedEventArgs e)
+        {
+            if (e.Cancelled)
+                MessageBox.Show("Instalação foi cancelada!\nÉ recomendado restaurar o backup.", "Aviso", MessageBoxButton.OK, MessageBoxImage.Error);
+            else if (e.Error != null)
+                MessageBox.Show(e.Error.Message + "\n A instalação não pode continuar!", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+            else
+            {
+                if (countFiles == (LE1_TLK_COUNT_INSTALLER + LE2_TLK_COUNT))
+                    MessageBox.Show(this, "Instalação foi concluida com êxito, aproveite!", "Atenção", MessageBoxButton.OK, MessageBoxImage.Information);
+                else
+                    MessageBox.Show(this, "Alguns arquivos não foram instalados, a tradução está incompleta.\n" +
+                        "Por favor, reinstale a tradução.", "Aviso", MessageBoxButton.OK, MessageBoxImage.Warning);
+            }
+
+            Application.Current.Shutdown();
         }
     }
 }

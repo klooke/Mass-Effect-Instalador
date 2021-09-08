@@ -12,8 +12,9 @@
     <Description>Utilizando a biblioteca do LegendaryExplorer, esse programa é utilizado para substituir e montar todos os arquivos TLKs, automatizando a instalação de traduções.</Description>
     <Copyright></Copyright>
     <StartupObject>MassEffectInstalador.App</StartupObject>
-    <AssemblyVersion>1.0.0.9</AssemblyVersion>
-    <FileVersion>1.0.0.9</FileVersion>
+    <AssemblyVersion>1.0.1.0</AssemblyVersion>
+    <FileVersion>1.0.1.0</FileVersion>
+    <Version>1.0.1</Version>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
