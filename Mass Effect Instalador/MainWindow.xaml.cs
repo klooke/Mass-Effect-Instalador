@@ -33,12 +33,14 @@ namespace MassEffectInstalador
             PackageSaver.Initialize();
             Dir.Maximum = (packagesPathLE1.Length * 2) + (talksPathLE2.Length * 2);
         }
+
         private void MainWindow_Loaded(object sender, EventArgs e)
         {
             Rect desktopWorkingArea = SystemParameters.WorkArea;
             Left = desktopWorkingArea.Right - Width;
             Top = desktopWorkingArea.Bottom - Height;
         }
+
         private void MainWindow_ContentRendered(object sender, EventArgs e)
         {
             worker = new()
@@ -51,6 +53,7 @@ namespace MassEffectInstalador
             worker.RunWorkerCompleted += Finished;
             worker.RunWorkerAsync();
         }
+
         private void MainWindow_Closing(object sender, CancelEventArgs e)
         {
             if (worker.IsBusy)
@@ -68,16 +71,19 @@ namespace MassEffectInstalador
             InstallTranslationLE1();
             InstallTranslationLE2();
         }
+
         private void CheckFilesToInstall()
         {
             if (NumberTlkToInstall(tlkPathLE1) != LE1_TLK_COUNT || NumberTlkToInstall(tlkPathLE2) != LE2_TLK_COUNT)
                 throw new InvalidOperationException("Arquivos da tradução não foram encontrados!\n" +
                     "Por favor, baixe a tradução novamente, caso o erro persista desative o ant-virus e tente novamente.");
         }
+
         private static int NumberTlkToInstall(string path)
         {
             return Directory.Exists(path) ? Directory.GetFiles(path, "*.xml").Length : 0;
         }
+
         private void MakeBackup()
         {
             try
@@ -110,6 +116,7 @@ namespace MassEffectInstalador
                     "Por favor, execute a tradução como administrador e tente novamente, caso o erro persista repare o game.");
             }
         }
+
         private void InstallTranslationLE1()
         {
             try
@@ -137,6 +144,7 @@ namespace MassEffectInstalador
                     "Por favor, restaure o backup e tente novamente, caso o erro persista entre em contato klooke2018@gmail.com.");
             }
         }
+
         private void InstallTranslationLE2()
         {
             try
@@ -158,23 +166,26 @@ namespace MassEffectInstalador
                     "Por favor, restaure o backup e tente novamente, caso o erro persista entre em contato klooke2018@gmail.com.");
             }
         }
+
         private void UpdateProgess(string message, int value)
         {
             subTitleUpdate = message;
             worker.ReportProgress(value);
         }
+
         private void ProgressChanged(object sender, ProgressChangedEventArgs e)
         {
             Dir.Value = e.ProgressPercentage;
             string percentage = (int)(e.ProgressPercentage / Dir.Maximum * 100) + "%";
             textTitulo.Text = subTitleUpdate + percentage;
         }
+
         private void Finished(object sender, RunWorkerCompletedEventArgs e)
         {
             if (e.Cancelled)
                 MessageBox.Show("Instalação foi cancelada!\nÉ recomendado restaurar o backup.", "Aviso", MessageBoxButton.OK, MessageBoxImage.Error);
             else if (e.Error != null)
-                MessageBox.Show(e.Error.Message + "\n A instalação não pode continuar!", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                MessageBox.Show(e.Error.Message, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
             else
             {
                 if (countFiles == (LE1_TLK_COUNT_INSTALLER + LE2_TLK_COUNT))

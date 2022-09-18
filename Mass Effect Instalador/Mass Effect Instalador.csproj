@@ -37,7 +37,7 @@
 
   <ItemGroup>
     <Reference Include="LegendaryExplorerCore">
-      <HintPath>..\..\LegendaryExplorer\LegendaryExplorer\LegendaryExplorerCore\bin\x64\WPFDebug\net5.0\LegendaryExplorerCore.dll</HintPath>
+      <HintPath>LegendaryExplorerCore.dll</HintPath>
     </Reference>
   </ItemGroup>
 
